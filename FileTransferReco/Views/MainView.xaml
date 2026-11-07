@@ -9,19 +9,28 @@
         mc:Ignorable="d"
         FontSize="20"
         Title="文件传输工具" Height="450" Width="800">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"></ColumnDefinition>
-            <ColumnDefinition Width="10*"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-
-        <StackPanel Grid.Column="0">
-            <RadioButton Content="主页面"/>
-            <RadioButton Content="设置"/>
-            
-        </StackPanel>
+    <DockPanel>
+            <!--顶部快捷栏-->
+        <Grid DockPanel.Dock="Top" Height="20"></Grid>
+            <!--底部状态栏-->
+        <Grid DockPanel.Dock="Bottom" Height="20"></Grid>
         
-        <ContentControl Grid.Column="1" p:RegionManager.RegionName="MainRegion"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
+                <ColumnDefinition Width="10*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <!--菜单栏-->
+            <StackPanel Grid.Column="0">
+                <RadioButton Content="主页面" Command="{Binding RegionNavigation}" IsChecked="True" CommandParameter="FileTransferView"/>
+                <RadioButton Content="设备连接" Command="{Binding RegionNavigation}" CommandParameter="EquipmentView"/>
+                <RadioButton Content="设置" Command="{Binding RegionNavigation}" CommandParameter="SettingsView"/>
+            
+            </StackPanel>
+            <!--主区域栏-->
+            <ContentControl Grid.Column="1" p:RegionManager.RegionName="MainRegion"/>
 
-    </Grid>
+        </Grid>
+
+    </DockPanel>
 </Window>

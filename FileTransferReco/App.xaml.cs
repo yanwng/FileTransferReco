@@ -17,8 +17,10 @@ namespace FileTransferReco
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            //文件传输界面 
-            containerRegistry.RegisterForNavigation<FileTransferView>();
+            //导航页面注册 
+            containerRegistry.RegisterForNavigation<FileTransferView>(); //文件传输界面
+            containerRegistry.RegisterForNavigation<EquipmentView>();    //设备界面
+            containerRegistry.RegisterForNavigation<SettingsView>();     //设置界面
         }
     }
 
