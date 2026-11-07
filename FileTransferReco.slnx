@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="FileTransferReco/FileTransferReco.csproj" />
+  <Project Path="Tools/Tools.csproj" Id="a78d2bd7-09ef-4466-9e65-b9b476c0638e" />
+</Solution>
