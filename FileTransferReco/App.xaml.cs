@@ -19,7 +19,8 @@ namespace FileTransferReco
         {
             //导航页面注册 
             containerRegistry.RegisterForNavigation<FileTransferView>(); //文件传输界面
-            containerRegistry.RegisterForNavigation<EquipmentView>();    //设备界面
+            containerRegistry.RegisterForNavigation<EquipmentManagementView>();    //设备管理界面
+            containerRegistry.RegisterForNavigation<EquipmentConnectionView>();    //设备界面
             containerRegistry.RegisterForNavigation<SettingsView>();     //设置界面
         }
     }

@@ -12,16 +12,36 @@ namespace FileTransferReco.ViewModels
         private IRegionManager _regionManager;
         //导航到页面
         public DelegateCommand<string> RegionNavigation { get; set; }
+
+
+        //接受连接
+        public DelegateCommand<bool?> AcceptSocket { get; set; }
+
         public MainViewModel(IRegionManager regionManager)
         {
             _regionManager = regionManager;
 
             //Command初始化
-
             RegionNavigation = new DelegateCommand<string>(RegionNavigation_Method);
+            AcceptSocket = new DelegateCommand<bool?>(AcceptSocket_Method);
 
-            //初始化服务端Socket，持续接受连接(8080端口)
-            SocketHelper.StartAccept();
+
+            
+        }
+
+        private void AcceptSocket_Method(bool? isChecked)
+        {
+            if (isChecked == true)
+            {
+                //初始化服务端Socket，持续接受连接(8080端口)
+                SocketHelper.StartAccept();
+                LogHelper.RecordAsync("服务端8080已打开");
+            }
+            else
+            {
+                SocketHelper.StopAccept();
+                LogHelper.RecordAsync("服务端8080已关闭");
+            }
         }
 
         /// <summary>
@@ -31,6 +51,7 @@ namespace FileTransferReco.ViewModels
         private void RegionNavigation_Method(string viewName)
         {
             _regionManager.RequestNavigate("MainRegion", viewName);
+            LogHelper.RecordAsync("MainRegion导航到"+viewName);
         }
     }
 }

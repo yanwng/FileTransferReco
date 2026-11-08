@@ -4,13 +4,33 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FileTransferReco.Views"
+             xmlns:p="http://prismlibrary.com/"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="15*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+        </Grid.RowDefinitions>
         <ListBox>
             <ListBoxItem>1</ListBoxItem>
             <ListBoxItem>1</ListBoxItem>
             <ListBoxItem>1</ListBoxItem>
-        </ListBox>  
+        </ListBox>
+
+        <DockPanel Grid.Row="1" Background="AliceBlue">
+            <Button DockPanel.Dock="Right" MinWidth="70">发送</Button>
+            <TextBlock TextAlignment="Center" VerticalAlignment="Center" Text="选择文件" >
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <p:InvokeCommandAction
+                            Command="{Binding OpenSelecteFileDialog}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TextBlock}}"
+                            />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TextBlock>
+        </DockPanel>
     </Grid>
 </UserControl>

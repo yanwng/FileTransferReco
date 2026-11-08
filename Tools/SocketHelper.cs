@@ -16,7 +16,7 @@ namespace Tools
     public class RemoteInfo
     {
         public string? RemoteName { get; set; }
-        public EndPoint? RemoteIP { get; set; }
+        public string RemoteIP { get; set; }
         public Socket? RemoteSocket { get; set; }
 
         public bool IsConnected { get; set; }
@@ -76,18 +76,43 @@ namespace Tools
                 while (!AcceptTokenSource.Token.IsCancellationRequested)
                 {
                     //接受连接
-                    Socket socket = await Master.AcceptAsync();
+                    try
+                    {
+                        Socket socket = await Master.AcceptAsync();
+                        //查看是否为曾连接过的IP
+                        RemoteInfo result = FindByRemoteEndPoint(socket.RemoteEndPoint);
+                        if (result != null) 
+                        {
+                            result.IsConnected = true;
+                            result.RemoteSocket = socket;
+                            continue;
+                        }
 
-                    RemoteInfo remote =  new RemoteInfo() 
-                    { RemoteName = socket.RemoteEndPoint?.ToString(), 
-                        RemoteIP = socket.RemoteEndPoint,
-                        RemoteSocket = socket, IsConnected = true };
+                        IPEndPoint remoteEp = socket.RemoteEndPoint as IPEndPoint;
+                        string remoteIP = "";
+                        if (remoteEp != null)
+                        {
+                             remoteIP = remoteEp.Address.ToString();
+                        }
 
-                    if(!AcceptTokenSource.Token.IsCancellationRequested)
-                        ConnectedSocket.Add(remote);
+                        RemoteInfo remote = new RemoteInfo()
+                        {
+                            RemoteName = socket.RemoteEndPoint?.ToString(),
+                            RemoteIP = remoteIP,
+                            RemoteSocket = socket,
+                            IsConnected = true
+                        };
+
+                        if (!AcceptTokenSource.Token.IsCancellationRequested)
+                            ConnectedSocket.Add(remote);
+                    }
+                    catch (Exception ex) 
+                    {
+                        LogHelper.RecordAsync(ex.Message);
+                    }
                 }
                 //设置退出接受状态
-                IsStartAccept = false;
+                IsStartAccept = false;            
 
             }, AcceptTokenSource.Token);
         }
@@ -98,8 +123,9 @@ namespace Tools
         /// <param name="iPEndPoint"></param>
         public static void StartAccept(IPEndPoint iPEndPoint)
         {
+            if (IsStartAccept) return;
             Socket master = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            
+
             //可能发生异常，向调用者抛出
             master.Bind(iPEndPoint);
 
@@ -115,9 +141,11 @@ namespace Tools
         /// <param name="port"></param>
         public static void StartAccept(int port)
         {
-            Socket master = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            if(IsStartAccept) return;
+
+            Socket master = new Socket(AddressFamily.InterNetwork,SocketType.Stream, ProtocolType.Tcp);
             master.Bind(new IPEndPoint(IPAddress.Any, port));
-            master.Listen();
+            master.Listen(10);
             StartAccept(master);
         }
 
@@ -134,9 +162,19 @@ namespace Tools
         /// </summary>
         public static void StopAccept()
         {
-            AcceptTokenSource?.Cancel();
+            try
+            {
+                AcceptTokenSource?.Cancel();
+            }catch(Exception ex)
+            {
+                LogHelper.RecordAsync(ex.Message);
+            }
+            Master?.Dispose();
         }
 
+        /// <summary>
+        /// 维护连接
+        /// </summary>
         private static void ConnectionStatus()
         {
             ConnectedStatusTokenSource = new CancellationTokenSource();
@@ -162,6 +200,23 @@ namespace Tools
                     await Task.Delay(1000);
                 }
             }, ConnectedStatusTokenSource.Token);
+        }
+
+        /// <summary>
+        /// 根据EndPoint在维护的连接中查找
+        /// </summary>
+        /// <param name="endPoint"></param>
+        /// <returns></returns>
+        private static RemoteInfo FindByRemoteEndPoint(EndPoint endPoint)
+        {
+            IPEndPoint remoteEp = endPoint as IPEndPoint;
+            string remoteIP = "";
+            if (remoteEp != null)
+            {
+                remoteIP = remoteEp.Address.ToString();
+            }
+            return ConnectedSocket.FirstOrDefault<RemoteInfo>(remote=>remote.RemoteIP== remoteIP);
+            
         }
     }
 }

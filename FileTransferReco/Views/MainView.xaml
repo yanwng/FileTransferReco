@@ -11,7 +11,11 @@
         Title="文件传输工具" Height="450" Width="800">
     <DockPanel>
             <!--顶部快捷栏-->
-        <Grid DockPanel.Dock="Top" Height="20"></Grid>
+        <Grid DockPanel.Dock="Top" Height="40">
+            <CheckBox Command="{Binding AcceptSocket}"
+                      CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}"
+                      >接受连接</CheckBox>
+        </Grid>
             <!--底部状态栏-->
         <Grid DockPanel.Dock="Bottom" Height="20"></Grid>
         
@@ -23,12 +27,13 @@
             <!--菜单栏-->
             <StackPanel Grid.Column="0">
                 <RadioButton Content="主页面" Command="{Binding RegionNavigation}" IsChecked="True" CommandParameter="FileTransferView"/>
-                <RadioButton Content="设备连接" Command="{Binding RegionNavigation}" CommandParameter="EquipmentView"/>
+                <RadioButton Content="设备管理" Command="{Binding RegionNavigation}" CommandParameter="EquipmentManagementView"/>
+                <RadioButton Content="设备连接" Command="{Binding RegionNavigation}" CommandParameter="EquipmentConnectionView"/>
                 <RadioButton Content="设置" Command="{Binding RegionNavigation}" CommandParameter="SettingsView"/>
             
             </StackPanel>
             <!--主区域栏-->
-            <ContentControl Grid.Column="1" p:RegionManager.RegionName="MainRegion"/>
+            <ContentControl Grid.Column="1" Margin="0,0,10,0" p:RegionManager.RegionName="MainRegion"/>
 
         </Grid>
 

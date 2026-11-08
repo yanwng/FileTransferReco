@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace FileTransferReco.Views
 {
     /// <summary>
-    /// EquipmentView.xaml 的交互逻辑
+    /// EquipmentManagementView.xaml 的交互逻辑
     /// </summary>
-    public partial class EquipmentView : UserControl
+    public partial class EquipmentManagementView : UserControl
     {
-        public EquipmentView()
+        public EquipmentManagementView()
         {
             InitializeComponent();
         }

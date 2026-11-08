@@ -29,6 +29,8 @@ namespace FileTransferReco.Views
 
             //加载初始界面
             regionManager.RequestNavigate("MainRegion", "FileTransferView");
+
+            
         }
 
        
