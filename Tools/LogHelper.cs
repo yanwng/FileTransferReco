@@ -11,6 +11,8 @@ namespace Tools
     /// </summary>
     public static class LogHelper
     {
+        public static FileStream Stream { get; set; }
+
         public static void Record(string message)
         {
             if (!Directory.Exists("Logs"))
@@ -18,20 +20,22 @@ namespace Tools
                 Directory.CreateDirectory("Logs");
             }
             string filePath = "Logs\\" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt";
-            FileStream stream;
-           if(File.Exists(filePath))
+            if(File.Exists(filePath))
             {
-                stream = new FileStream(filePath,FileMode.Append,FileAccess.Write);
+                if(Stream==null)
+                    Stream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read);
+                
             }
             else
             {
-                stream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+                Stream?.Dispose();
+                Stream = new FileStream(filePath, FileMode.Create, FileAccess.Write,FileShare.Read);
             }
 
+            Stream.Write(Encoding.UTF8.GetBytes($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}：{message}\n"));
 
-            stream.Write(Encoding.UTF8.GetBytes($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}：{message}"));
-            stream.Flush();
-            stream.Dispose();
+            Stream.FlushAsync();
+            
         }
 
         public static void RecordAsync(string message)
