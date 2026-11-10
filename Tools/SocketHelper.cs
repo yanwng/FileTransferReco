@@ -79,7 +79,9 @@ namespace Tools
                     try
                     {
                         Socket socket = await Master.AcceptAsync();
+
                         //查看是否为曾连接过的IP
+                        //同一个IP连接，只会保存最新的Socket
                         RemoteInfo result = FindByRemoteEndPoint(socket.RemoteEndPoint);
                         if (result != null) 
                         {
@@ -116,6 +118,8 @@ namespace Tools
 
             }, AcceptTokenSource.Token);
         }
+
+
 
         /// <summary>
         /// 指定IPEndPoint创建服务端
@@ -217,6 +221,41 @@ namespace Tools
             }
             return ConnectedSocket.FirstOrDefault<RemoteInfo>(remote=>remote.RemoteIP== remoteIP);
             
+        }
+
+
+        /// <summary>
+        /// 读取指定的字节数
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <param name="buffer"></param>
+        /// <returns></returns>
+        public static bool ReceiveFullToBytes(RemoteInfo remote,byte[] buffer)
+        {
+            int offest = 0;
+            int readLen = 0;
+            int len = buffer.Length;
+            while (offest < len)
+            {
+                try
+                {
+                    if (!remote.IsConnected)
+                    {
+                        LogHelper.RecordAsync($"{remote.RemoteIP}已断开，数据接收不完整", LogLevel.WARN);
+                        return false;
+                    }
+                    readLen = remote.RemoteSocket!.Receive(buffer, offest, len - offest, SocketFlags.None);
+                    offest += readLen;
+                    
+                }catch (Exception ex)
+                {
+                    LogHelper.RecordAsync(ex.Message+" 接收指定大小字节数错误", LogLevel.ERROR);
+                    return false;
+                }
+            }
+
+            return true;
+
         }
     }
 }
