@@ -108,7 +108,7 @@ namespace Tools
                     }
                     catch (Exception ex) 
                     {
-                        LogHelper.RecordAsync(ex.Message);
+                        LogHelper.RecordAsync(ex.Message+" Socket退出接受连接",LogLevel.INFO);
                     }
                 }
                 //设置退出接受状态
@@ -167,7 +167,7 @@ namespace Tools
                 AcceptTokenSource?.Cancel();
             }catch(Exception ex)
             {
-                LogHelper.RecordAsync(ex.Message);
+                LogHelper.RecordAsync(ex.Message,LogLevel.ERROR);
             }
             Master?.Dispose();
         }

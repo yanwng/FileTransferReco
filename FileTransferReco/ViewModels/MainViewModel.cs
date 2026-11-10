@@ -35,12 +35,12 @@ namespace FileTransferReco.ViewModels
             {
                 //初始化服务端Socket，持续接受连接(8080端口)
                 SocketHelper.StartAccept();
-                LogHelper.RecordAsync("服务端8080已打开");
+                LogHelper.RecordAsync("服务端8080已打开",LogLevel.INFO);
             }
             else
             {
                 SocketHelper.StopAccept();
-                LogHelper.RecordAsync("服务端8080已关闭");
+                LogHelper.RecordAsync("服务端8080已关闭", LogLevel.INFO);
             }
         }
 
@@ -51,7 +51,7 @@ namespace FileTransferReco.ViewModels
         private void RegionNavigation_Method(string viewName)
         {
             _regionManager.RequestNavigate("MainRegion", viewName);
-            LogHelper.RecordAsync("MainRegion导航到"+viewName);
+            LogHelper.RecordAsync("MainRegion导航到"+viewName, LogLevel.INFO);
         }
     }
 }
