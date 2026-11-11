@@ -46,8 +46,13 @@ namespace FileTransferReco.ViewModels
         /// </summary>
         public ConcurrentDictionary<RemoteInfo, CancellationTokenSource> ReceivingSocket;
 
-        public FileTransferViewModel()
+        public AppConfig _AppConfig { get; set; }
+
+        public FileTransferViewModel(AppConfig appConfig)
         {
+            //注入配置信息
+            _AppConfig = appConfig;
+
             //数据初始化
             FileDetailList = new ObservableCollection<FileDetail>();
             SelectedRemoteInfo = new ConcurrentBag<RemoteInfo>();
@@ -59,6 +64,7 @@ namespace FileTransferReco.ViewModels
 
             //开始接收已连接的socket数据
             ReceiveData();
+            
         }
 
         /// <summary>
@@ -106,17 +112,22 @@ namespace FileTransferReco.ViewModels
                                         break;
                                     }
 
+                                    //将文件添加到传输列表
                                     FileDetailList.Add(fileDetail);
+
+
+                                    //读取网络字节流，文件持久化存储
                                     int readLen = 0;
                                     byte[] buffer = new byte[30 * 1024];
-                                    string dir = "download\\";
-                                    using (FileStream stream = new FileStream(dir + fileDetail.FileName, FileMode.Create))
+                                    
+                                    using (FileStream stream = new FileStream($"{_AppConfig.DownLoadFileDir}\\{fileDetail.FileName}", FileMode.Create))
                                         while (fileDetail.ReceiveSize < fileDetail.FileSize)
                                         {
                                             try
                                             {
                                                 readLen = await remote.RemoteSocket.ReceiveAsync(buffer);
                                                 await stream.WriteAsync(buffer, 0, readLen);
+                                                await stream.FlushAsync();
 
                                             }
                                             catch (Exception ex)
@@ -132,7 +143,7 @@ namespace FileTransferReco.ViewModels
 
 
                             }, cancellationTokenSource.Token).ContinueWith(task =>
-                            {
+                            {   //接收文件的线程退出后移除集合
                                 ReceivingSocket.Remove(remote, out var cancelSource);
                                 cancelSource!.Cancel();
                             });
@@ -164,6 +175,7 @@ namespace FileTransferReco.ViewModels
                 Task.Run(async () =>
                 {
                     //发送文件头大小以及文件头
+                    LogHelper.RecordAsync($"开始发送文件{SelectedFile.FileName}", LogLevel.INFO);
                     await remote.RemoteSocket!.SendAsync(BitConverter.GetBytes(headerSize));
                     await remote.RemoteSocket!.SendAsync(header);
 
@@ -180,6 +192,7 @@ namespace FileTransferReco.ViewModels
                             remote.RemoteSocket.Send(buffer, 0, readLen, System.Net.Sockets.SocketFlags.None);
                             SelectedFile.SendSize = sendCount;
                         }
+                        LogHelper.RecordAsync($"文件{SelectedFile.FileName}发送完毕", LogLevel.INFO);
                     }
 
                 });

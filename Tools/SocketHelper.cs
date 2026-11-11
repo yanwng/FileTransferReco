@@ -15,10 +15,22 @@ namespace Tools
     /// </summary>
     public class RemoteInfo
     {
+        /// <summary>
+        /// 远程设备名称
+        /// </summary>
         public string? RemoteName { get; set; }
+        /// <summary>
+        /// 远程设备唯一标识
+        /// </summary>
         public string RemoteIP { get; set; }
+        /// <summary>
+        /// 连接socket
+        /// </summary>
         public Socket? RemoteSocket { get; set; }
 
+        /// <summary>
+        /// 是否处于连接状态
+        /// </summary>
         public bool IsConnected { get; set; }
 
     }

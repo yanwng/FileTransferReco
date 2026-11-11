@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FileTransferReco.models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace FileTransferReco.ViewModels
     public class MainViewModel:BindableBase
     {
         private IRegionManager _regionManager;
+        public AppConfig _AppConfig { get; set; }
         //导航到页面
         public DelegateCommand<string> RegionNavigation { get; set; }
 
@@ -17,9 +19,11 @@ namespace FileTransferReco.ViewModels
         //接受连接
         public DelegateCommand<bool?> AcceptSocket { get; set; }
 
-        public MainViewModel(IRegionManager regionManager)
+        public MainViewModel(IRegionManager regionManager,AppConfig appConfig)
         {
+            //依赖注入
             _regionManager = regionManager;
+            _AppConfig= appConfig;
 
             //Command初始化
             RegionNavigation = new DelegateCommand<string>(RegionNavigation_Method);
@@ -34,13 +38,13 @@ namespace FileTransferReco.ViewModels
             if (isChecked == true)
             {
                 //初始化服务端Socket，持续接受连接(8080端口)
-                SocketHelper.StartAccept();
-                LogHelper.RecordAsync("服务端8080已打开",LogLevel.INFO);
+                SocketHelper.StartAccept(_AppConfig.ServerPort);
+                LogHelper.RecordAsync($"服务端{_AppConfig.ServerPort}端口已打开",LogLevel.INFO);
             }
             else
             {
                 SocketHelper.StopAccept();
-                LogHelper.RecordAsync("服务端8080已关闭", LogLevel.INFO);
+                LogHelper.RecordAsync($"服务端{_AppConfig.ServerPort}端口已关闭", LogLevel.INFO);
             }
         }
 
