@@ -9,11 +9,31 @@ using Tools;
 
 namespace FileTransferReco.ViewModels
 {
-    public class EquipmentConnectionViewModel : BindableBase
+    public class EquipmentConnectionViewModel : BindableBase,IRegionAware,IRegionMemberLifetime
     {
         public ObservableCollection<RemoteInfo> ConnectionSocket { get; set; } = new ObservableCollection<RemoteInfo>();
 
+        public bool KeepAlive => false;
+
         public EquipmentConnectionViewModel()
+        {
+            
+        }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            foreach (RemoteInfo remote in SocketHelper.ConnectedSocket)
+            {
+                ConnectionSocket.Add(remote);
+            }
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return false;
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
         {
             
         }

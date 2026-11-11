@@ -6,7 +6,38 @@
              xmlns:local="clr-namespace:FileTransferReco.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+    <Grid >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="8*"></ColumnDefinition>
+            <ColumnDefinition Width="2*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <!--配置展示界面-->
+
+        <TextBlock Grid.Row="0">
+                <Run FontSize="25">文件下载地址</Run>
+                <LineBreak></LineBreak>
+                <Run Text="{Binding _AppConfig.DownLoadFileDir}"></Run>
+        </TextBlock>
+
+        <TextBlock Grid.Row="1">
+                <Run FontSize="25">本地服务器端口</Run>
+                <LineBreak></LineBreak>
+                <TextBox x:Name="serverPortBox" BorderThickness="0" Text="{Binding _AppConfig.ServerPort, Mode=OneWay}"></TextBox>
+        </TextBlock>
+
+
+        <!--配置修改按钮-->
+        <Button Grid.Column="1" Grid.Row="0" Margin="20,5" Command="{Binding UpdataAppConfig}" CommandParameter="DownLoadFileDir">更改存储路径</Button>
+        <Button Grid.Column="1" Grid.Row="1" Margin="20,5" 
+                Command="{Binding UpdataServerPort}" 
+                CommandParameter="{Binding ElementName=serverPortBox}">更改端口</Button>
+
     </Grid>
 </UserControl>

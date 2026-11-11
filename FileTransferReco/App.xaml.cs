@@ -64,7 +64,7 @@ namespace FileTransferReco
             {
                 //首次启动，创建配置文件
                 AppConfig appConfig = new AppConfig();
-                appConfig.DownLoadFileDir = "downLoad";
+                appConfig.DownLoadFileDir = Directory.GetCurrentDirectory()+"\\downLoad";
                 appConfig.ServerPort = 8080;
 
                 using (FileStream stream = new FileStream("AppConfig.xml", FileMode.Create))
