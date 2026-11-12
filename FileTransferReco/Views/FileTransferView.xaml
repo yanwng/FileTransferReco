@@ -15,8 +15,17 @@
             <RowDefinition Height="1*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Background="AliceBlue">
-            
-            <TextBlock Text="选择设备"  TextAlignment="Center" VerticalAlignment="Center" />
+
+            <TextBlock x:Name="selectEquipment" Text="选择设备"  TextAlignment="Center" VerticalAlignment="Center">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <p:InvokeCommandAction
+                            Command="{Binding SelectEquipment}"
+                            CommandParameter="{Binding ElementName=selectEquipment}"
+                            />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TextBlock>
         </Grid>
         <ListBox Grid.Row="1">
             <ListBoxItem>1</ListBoxItem>

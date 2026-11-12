@@ -26,6 +26,13 @@ namespace FileTransferReco.ViewModels
         /// 发送文件
         /// </summary>
         public DelegateCommand<TextBlock> SendFile { get; set; }
+
+        /// <summary>
+        /// 选择需要发送到的设备
+        /// </summary>
+        public DelegateCommand<TextBlock> SelectEquipment { get; set; }
+
+
         /// <summary>
         /// 选择的文件的详细信息
         /// </summary>
@@ -61,9 +68,19 @@ namespace FileTransferReco.ViewModels
             //命令初始化
             OpenSelecteFileDialog = new DelegateCommand<TextBlock>(SelecteFile_Method);
             SendFile = new DelegateCommand<TextBlock>(SendFile_Method);
+            SelectEquipment = new DelegateCommand<TextBlock>(SelectEquipment_Method);
 
             //开始接收已连接的socket数据
             ReceiveData();
+            
+        }
+
+        /// <summary>
+        /// 选择需要发送到的设备
+        /// </summary>
+        /// <param name="block">展示所有选择的设备的控件</param>
+        private void SelectEquipment_Method(TextBlock block)
+        {
             
         }
 

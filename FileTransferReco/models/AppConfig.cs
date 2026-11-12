@@ -27,6 +27,25 @@ namespace FileTransferReco.models
         /// </summary>
         public int ServerPort { get; set; }
 
+
+        /// <summary>
+        /// 寻找设备广播的网段
+        /// </summary>
+        public string FindEquipmentServerAddr { get; set; } = "10.81.76.255";
+        /// <summary>
+        /// 寻找设备广播的端口
+        /// </summary>
+        public int FindEquipmentServerPort { get; set; } = 23499;
+
+        /// <summary>
+        /// 广播回复IP
+        /// </summary>
+        public string EquipmentServerAddr { get; set; } = "10.81.76.178";
+        /// <summary>
+        /// 广播回复端口
+        /// </summary>
+        public int EquipmentServerPort { get; set; } = 22499;
+
         public event PropertyChangedEventHandler? PropertyChanged;
     }
 }
