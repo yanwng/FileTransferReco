@@ -46,6 +46,11 @@ namespace FileTransferReco.models
         /// </summary>
         public int EquipmentServerPort { get; set; } = 22499;
 
+        /// <summary>
+        /// 寻找设备时发出的信息
+        /// </summary>
+        public string UdpFindEquipmentData { get; set; } = "FileTransferReco";
+
         public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

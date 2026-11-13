@@ -8,6 +8,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Threading;
 using Tools;
 
 namespace FileTransferReco.ViewModels
@@ -19,7 +21,7 @@ namespace FileTransferReco.ViewModels
         /// </summary>
         public ObservableCollection<RemoteInfo> CanConnectionSocket { get; set; } = new ObservableCollection<RemoteInfo>();
 
-        public DelegateCommand FlushEquipment { get; set; }
+        public DelegateCommand<ListBox> FlushEquipment { get; set; }
 
         public AppConfig _AppConfig { get; set; }
 
@@ -31,7 +33,7 @@ namespace FileTransferReco.ViewModels
             //依赖注入
             _AppConfig = appConfig;
             //初始化命令
-            FlushEquipment = new DelegateCommand(FlushEquipment_Mehtod);
+            FlushEquipment = new DelegateCommand<ListBox>(FlushEquipment_Mehtod);
 
 
 
@@ -40,7 +42,7 @@ namespace FileTransferReco.ViewModels
         /// <summary>
         /// 更新扫描到的设备
         /// </summary>
-        private async void FlushEquipment_Mehtod()
+        private async void FlushEquipment_Mehtod(ListBox equipmentList)
         {
 
             UpdataCanConnectionSocket();
@@ -48,37 +50,100 @@ namespace FileTransferReco.ViewModels
             FindEquipment();
 
             //接收广播 只接收3s
-            await ReceiveEquipmentReply(); 
+            await ReceiveEquipmentReply(equipmentList);
 
-        }
-
-        private async Task ReceiveEquipmentReply()
-        {
-            await Task.Run(() =>
-            {
-
-            });
         }
 
         /// <summary>
-        /// 发送一次广播，将当前局域网IP传过去
+        /// 接收3秒回复
+        /// </summary>
+        /// <returns></returns>
+        private async Task ReceiveEquipmentReply(ListBox equipmentList)
+        {
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            UdpClient replyClient = new UdpClient(_AppConfig.EquipmentServerAddr, _AppConfig.EquipmentServerPort);
+            _ = Task.Run(() =>
+            {
+                try
+                {
+
+
+                    while (!cancellationTokenSource.Token.IsCancellationRequested)
+                    {
+                        IPEndPoint remoteIP = new IPEndPoint(IPAddress.Any, 0);
+                        try
+                        {
+
+                            byte[] data = replyClient.Receive(ref remoteIP);
+
+                        }
+                        catch (Exception ex)
+                        {
+                            LogHelper.RecordAsync("Udp接收设备已关闭", LogLevel.INFO);
+                        }
+
+                        if (remoteIP.Address.ToString() != "0.0.0.0" && !IsInCanConnectionSocket(remoteIP))
+                        {
+                            RemoteInfo remoteInfo = new RemoteInfo();
+                            remoteInfo.IsConnected = false;
+                            remoteInfo.RemoteIP = remoteIP.ToString();
+                            remoteInfo.RemoteName = remoteIP.ToString();
+                            remoteInfo.RemoteSocket = null;
+                            LogHelper.RecordAsync($"查找到设备：{remoteIP}", LogLevel.INFO);
+                            equipmentList.Dispatcher.Invoke(() => { CanConnectionSocket.Add(remoteInfo); });
+
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.RecordAsync(ex.Message, LogLevel.ERROR);
+                }
+
+            }, cancellationTokenSource.Token);
+
+            await Task.Delay(3000);
+            LogHelper.RecordAsync("关闭Udp接受设备线程", LogLevel.WARN);
+            cancellationTokenSource.Cancel();
+            replyClient.Dispose();
+        }
+
+        /// <summary>
+        /// 该IP是否已经在集合中
+        /// </summary>
+        /// <param name="remoteIP"></param>
+        /// <returns></returns>
+        private bool IsInCanConnectionSocket(IPEndPoint remoteIP)
+        {
+       
+            foreach (RemoteInfo remoteInfo in CanConnectionSocket)
+            {
+                if (remoteInfo.RemoteIP == remoteIP.Address.ToString())
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 发送一次广播，查找设备
         /// </summary>
         /// <returns></returns>
         private void FindEquipment()
         {
             Task.Run(() =>
               {
-                  List<RemoteInfo> list = new List<RemoteInfo>();
                   UdpClient client = new UdpClient();
                   client.EnableBroadcast = true;
-                  //广播发送服务器地址
-                  string message = $"{_AppConfig.FindEquipmentServerAddr}-{_AppConfig.ServerPort}";
+                  //广播查找设备
+                  string message = _AppConfig.UdpFindEquipmentData;
                   byte[] data = Encoding.UTF8.GetBytes(message);
-                  //发送广播
+
+                  //发送IP和端口
                   client.SendAsync(data, data.Length,
                       new System.Net.IPEndPoint(IPAddress.Parse(_AppConfig.FindEquipmentServerAddr),
                       _AppConfig.FindEquipmentServerPort));
-                  LogHelper.RecordAsync("发送广播" + message, LogLevel.INFO);
+                  LogHelper.RecordAsync("发送广播：" + message, LogLevel.INFO);
 
               });
 

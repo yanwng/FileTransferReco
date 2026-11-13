@@ -10,12 +10,15 @@
              >
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="12*"></RowDefinition>
-            <RowDefinition Height="1*"></RowDefinition>
-            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="15*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
         </Grid.RowDefinitions>
-        <ListBox ItemsSource="{Binding CanConnectionSocket}" DisplayMemberPath="RemoteName"></ListBox>
-        <Button Grid.Row="1" Margin="0,5" Command="{Binding FlushEquipment}">刷新设备</Button>
-        <Button Grid.Row="2" Margin="0,5">连接设备</Button>
+        <ListBox x:Name="EquipmentList" ItemsSource="{Binding CanConnectionSocket}" DisplayMemberPath="RemoteName"></ListBox>
+        <Button Grid.Row="1" Margin="0,1" 
+                Command="{Binding FlushEquipment}"
+                CommandParameter="{Binding ElementName=EquipmentList}"
+                >刷新设备</Button>
+        <Button Grid.Row="2" Margin="0,1">连接设备</Button>
     </Grid>
 </UserControl>
