@@ -12,7 +12,7 @@ namespace FileTransferReco.ViewModels.Dialog
     {
         public string Title { get; set; } = "选择设备";
 
-        private ObservableCollection<RemoteInfo> canSendSockets;
+        private ObservableCollection<RemoteInfo> canSendSockets = new ObservableCollection<RemoteInfo>();
 
         /// <summary>
         /// 能够选择的Socket
