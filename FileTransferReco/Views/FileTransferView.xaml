@@ -16,9 +16,9 @@
         </Grid.RowDefinitions>
         <Grid Background="AliceBlue">
 
-            <TextBlock x:Name="selectEquipment" Text="选择设备"  TextAlignment="Center" VerticalAlignment="Center">
+            <TextBlock x:Name="selectEquipment"  Text="{Binding SelectEquipmentText}"  TextAlignment="Center" VerticalAlignment="Center">
                 <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Click">
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
                         <p:InvokeCommandAction
                             Command="{Binding SelectEquipment}"
                             />

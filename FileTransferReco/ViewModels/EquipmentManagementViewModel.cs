@@ -10,7 +10,9 @@ namespace FileTransferReco.ViewModels
 {
     public class EquipmentManagementViewModel:BindableBase,INavigationAware
     {
-
+        /// <summary>
+        /// 所有设备
+        /// </summary>
         public ObservableCollection<RemoteInfo> ConnectedSocket { get; set; } = new ObservableCollection<RemoteInfo>();
 
         public EquipmentManagementViewModel()

@@ -59,6 +59,17 @@ namespace FileTransferReco.ViewModels
         }
 
 
+        private string selectEquipmentText = "选择设备";
+
+        /// <summary>
+        /// 选择设备的文字
+        /// </summary>
+        public string SelectEquipmentText
+        {
+            get { return selectEquipmentText; }
+            set { SetProperty(ref selectEquipmentText,value); }
+        }
+
 
         /// <summary>
         /// 正在接收数据中的socket
@@ -67,10 +78,13 @@ namespace FileTransferReco.ViewModels
 
         public AppConfig _AppConfig { get; set; }
 
-        public FileTransferViewModel(AppConfig appConfig)
+        public IDialogService _DialogService { get; set; }
+
+        public FileTransferViewModel(AppConfig appConfig,IDialogService dialogService)
         {
             //注入配置信息
             _AppConfig = appConfig;
+            _DialogService = dialogService;
 
             //数据初始化
             FileDetailList = new ObservableCollection<FileDetail>();
@@ -93,7 +107,14 @@ namespace FileTransferReco.ViewModels
         /// <param name="block">展示所有选择的设备的控件</param>
         private void SelectEquipment_Method()
         {
-
+            _DialogService.ShowDialog("SelectEquipmentDialogView", result => 
+            {
+                List<RemoteInfo> remoteInfos = result.Parameters.GetValue<List<RemoteInfo>>("selectedRemotes");
+                foreach (RemoteInfo remote in remoteInfos)
+                {
+                    PrismApplication.Current.Dispatcher.Invoke(() => { SelectedRemoteInfo.Add(remote); });
+                }
+            });
         }
 
         /// <summary>

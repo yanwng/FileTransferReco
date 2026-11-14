@@ -1,5 +1,6 @@
 ﻿using FileTransferReco.models;
 using FileTransferReco.Views;
+using FileTransferReco.Views.Dialog;
 using System.Configuration;
 using System.Data;
 using System.IO;
@@ -29,6 +30,9 @@ namespace FileTransferReco
             containerRegistry.RegisterForNavigation<EquipmentManagementView>();    //设备管理界面
             containerRegistry.RegisterForNavigation<EquipmentConnectionView>();    //设备界面
             containerRegistry.RegisterForNavigation<SettingsView>();     //设置界面
+
+            //弹窗页面注册
+            containerRegistry.RegisterDialog<SelectEquipmentDialogView>();
 
         }
 
