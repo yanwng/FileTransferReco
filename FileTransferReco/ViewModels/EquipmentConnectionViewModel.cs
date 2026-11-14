@@ -21,7 +21,7 @@ namespace FileTransferReco.ViewModels
         /// </summary>
         public ObservableCollection<RemoteInfo> CanConnectionSocket { get; set; } = new ObservableCollection<RemoteInfo>();
 
-        public DelegateCommand<ListBox> FlushEquipment { get; set; }
+        public DelegateCommand FlushEquipment { get; set; }
 
         public AppConfig _AppConfig { get; set; }
 
@@ -33,7 +33,7 @@ namespace FileTransferReco.ViewModels
             //依赖注入
             _AppConfig = appConfig;
             //初始化命令
-            FlushEquipment = new DelegateCommand<ListBox>(FlushEquipment_Mehtod);
+            FlushEquipment = new DelegateCommand(FlushEquipment_Mehtod);
 
 
 
@@ -42,7 +42,7 @@ namespace FileTransferReco.ViewModels
         /// <summary>
         /// 更新扫描到的设备
         /// </summary>
-        private async void FlushEquipment_Mehtod(ListBox equipmentList)
+        private async void FlushEquipment_Mehtod()
         {
 
             UpdataCanConnectionSocket();
@@ -50,7 +50,7 @@ namespace FileTransferReco.ViewModels
             FindEquipment();
 
             //接收广播 只接收3s
-            await ReceiveEquipmentReply(equipmentList);
+            await ReceiveEquipmentReply();
 
         }
 
@@ -58,7 +58,7 @@ namespace FileTransferReco.ViewModels
         /// 接收3秒回复
         /// </summary>
         /// <returns></returns>
-        private async Task ReceiveEquipmentReply(ListBox equipmentList)
+        private async Task ReceiveEquipmentReply()
         {
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             UdpClient replyClient = new UdpClient(_AppConfig.EquipmentServerAddr, _AppConfig.EquipmentServerPort);
@@ -90,7 +90,7 @@ namespace FileTransferReco.ViewModels
                             remoteInfo.RemoteName = remoteIP.ToString();
                             remoteInfo.RemoteSocket = null;
                             LogHelper.RecordAsync($"查找到设备：{remoteIP}", LogLevel.INFO);
-                            equipmentList.Dispatcher.Invoke(() => { CanConnectionSocket.Add(remoteInfo); });
+                            PrismApplication.Current.Dispatcher.Invoke(() => { CanConnectionSocket.Add(remoteInfo); });
 
                         }
                     }

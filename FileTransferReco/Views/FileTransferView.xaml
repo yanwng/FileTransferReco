@@ -21,7 +21,6 @@
                     <i:EventTrigger EventName="Click">
                         <p:InvokeCommandAction
                             Command="{Binding SelectEquipment}"
-                            CommandParameter="{Binding ElementName=selectEquipment}"
                             />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
@@ -36,14 +35,12 @@
         <DockPanel Grid.Row="2" Background="AliceBlue">
             <Button DockPanel.Dock="Right" MinWidth="70" 
                     Command="{Binding SendFile}" 
-                    CommandParameter="{Binding ElementName=selectTextBlock}"
                     >发送</Button>
-            <TextBlock x:Name="selectTextBlock" TextAlignment="Center" VerticalAlignment="Center" Text="选择文件" >
+            <TextBlock x:Name="selectTextBlock" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding TextContent}" >
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
                         <p:InvokeCommandAction
                             Command="{Binding OpenSelecteFileDialog}"
-                            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TextBlock}}"
                             />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>

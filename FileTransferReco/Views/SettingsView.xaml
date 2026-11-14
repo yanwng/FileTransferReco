@@ -29,7 +29,7 @@
         <TextBlock Grid.Row="1">
                 <Run FontSize="25">本地服务器端口</Run>
                 <LineBreak></LineBreak>
-                <TextBox x:Name="serverPortBox" BorderThickness="0" Text="{Binding _AppConfig.ServerPort, Mode=OneWay}"></TextBox>
+                <TextBox x:Name="serverPortBox" BorderThickness="0" Text="{Binding ServerPort, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
         </TextBlock>
 
 
@@ -37,7 +37,7 @@
         <Button Grid.Column="1" Grid.Row="0" Margin="20,5" Command="{Binding UpdataAppConfig}" CommandParameter="DownLoadFileDir">更改存储路径</Button>
         <Button Grid.Column="1" Grid.Row="1" Margin="20,5" 
                 Command="{Binding UpdataServerPort}" 
-                CommandParameter="{Binding ElementName=serverPortBox}">更改端口</Button>
+                >更改端口</Button>
 
     </Grid>
 </UserControl>

@@ -21,16 +21,16 @@ namespace FileTransferReco.ViewModels
         /// <summary>
         /// 选择文件
         /// </summary>
-        public DelegateCommand<TextBlock> OpenSelecteFileDialog { get; set; }
+        public DelegateCommand OpenSelecteFileDialog { get; set; }
         /// <summary>
         /// 发送文件
         /// </summary>
-        public DelegateCommand<TextBlock> SendFile { get; set; }
+        public DelegateCommand SendFile { get; set; }
 
         /// <summary>
         /// 选择需要发送到的设备
         /// </summary>
-        public DelegateCommand<TextBlock> SelectEquipment { get; set; }
+        public DelegateCommand SelectEquipment { get; set; }
 
 
         /// <summary>
@@ -47,6 +47,18 @@ namespace FileTransferReco.ViewModels
         /// 选择需要发送到的RemoteInfo
         /// </summary>
         public ConcurrentBag<RemoteInfo> SelectedRemoteInfo { get; set; }
+
+        private string textContent = "选择文件";
+        /// <summary>
+        /// 选择文件文本块内容
+        /// </summary>
+        public string TextContent
+        {
+            get { return textContent; }
+            set { SetProperty(ref textContent, value); }
+        }
+
+
 
         /// <summary>
         /// 正在接收数据中的socket
@@ -66,22 +78,22 @@ namespace FileTransferReco.ViewModels
             ReceivingSocket = new ConcurrentDictionary<RemoteInfo, CancellationTokenSource>();
 
             //命令初始化
-            OpenSelecteFileDialog = new DelegateCommand<TextBlock>(SelecteFile_Method);
-            SendFile = new DelegateCommand<TextBlock>(SendFile_Method);
-            SelectEquipment = new DelegateCommand<TextBlock>(SelectEquipment_Method);
+            OpenSelecteFileDialog = new DelegateCommand(SelecteFile_Method);
+            SendFile = new DelegateCommand(SendFile_Method);
+            SelectEquipment = new DelegateCommand(SelectEquipment_Method);
 
             //开始接收已连接的socket数据
             ReceiveData();
-            
+
         }
 
         /// <summary>
         /// 选择需要发送到的设备
         /// </summary>
         /// <param name="block">展示所有选择的设备的控件</param>
-        private void SelectEquipment_Method(TextBlock block)
+        private void SelectEquipment_Method()
         {
-            
+
         }
 
         /// <summary>
@@ -136,7 +148,7 @@ namespace FileTransferReco.ViewModels
                                     //读取网络字节流，文件持久化存储
                                     int readLen = 0;
                                     byte[] buffer = new byte[30 * 1024];
-                                    
+
                                     using (FileStream stream = new FileStream($"{_AppConfig.DownLoadFileDir}\\{fileDetail.FileName}", FileMode.Create))
                                         while (fileDetail.ReceiveSize < fileDetail.FileSize)
                                         {
@@ -179,8 +191,8 @@ namespace FileTransferReco.ViewModels
         /// <summary>
         /// 发送选择的文件
         /// </summary>
-        /// <param name="block"></param>
-        private void SendFile_Method(TextBlock block)
+    
+        private void SendFile_Method()
         {
             // if (SelectedFile == null || SelectedRemoteInfo.Count == 0) return;
 
@@ -191,25 +203,26 @@ namespace FileTransferReco.ViewModels
             {
                 Task.Run(async () =>
                 {
-                    //发送文件头大小以及文件头
-                    LogHelper.RecordAsync($"开始发送文件{SelectedFile.FileName}", LogLevel.INFO);
-                    await remote.RemoteSocket!.SendAsync(BitConverter.GetBytes(headerSize));
-                    await remote.RemoteSocket!.SendAsync(header);
+                //发送文件头大小以及文件头
+                LogHelper.RecordAsync($"开始发送文件{SelectedFile.FileName}", LogLevel.INFO);
+                await remote.RemoteSocket!.SendAsync(BitConverter.GetBytes(headerSize));
+                await remote.RemoteSocket!.SendAsync(header);
 
-                    using (FileStream stream =
-                    new FileStream(SelectedFile.FilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (FileStream stream =
+                new FileStream(SelectedFile.FilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    long sendCount = 0;
+                    int readLen = 0;
+                    byte[] buffer = new byte[30 * 1024];
+                    while (sendCount < SelectedFile.FileSize)
                     {
-                        long sendCount = 0;
-                        int readLen = 0;
-                        byte[] buffer = new byte[30 * 1024];
-                        while (sendCount < SelectedFile.FileSize)
-                        {
-                            readLen = await stream.ReadAsync(buffer, 0, buffer.Length);
-                            sendCount += readLen;
-                            remote.RemoteSocket.Send(buffer, 0, readLen, System.Net.Sockets.SocketFlags.None);
-                            SelectedFile.SendSize = sendCount;
-                        }
-                        LogHelper.RecordAsync($"文件{SelectedFile.FileName}发送完毕", LogLevel.INFO);
+                        readLen = await stream.ReadAsync(buffer, 0, buffer.Length);
+                        sendCount += readLen;
+                        remote.RemoteSocket.Send(buffer, 0, readLen, System.Net.Sockets.SocketFlags.None);
+                        SelectedFile.SendSize = sendCount;
+                    }
+                    LogHelper.RecordAsync($"文件{SelectedFile.FileName}发送完毕", LogLevel.INFO);
+                    PrismApplication.Current.Dispatcher.Invoke(() => { textContent = "选择文件"; });
                     }
 
                 });
@@ -223,7 +236,7 @@ namespace FileTransferReco.ViewModels
         /// 选择需要发送的文件
         /// </summary>
         /// <param name="block">显示选择的文件</param>
-        private void SelecteFile_Method(TextBlock block)
+        private void SelecteFile_Method()
         {
             OpenFileDialog selectFileDialog = new OpenFileDialog();
             selectFileDialog.Filter = "全部文件(*.*)|*.*";
@@ -240,8 +253,7 @@ namespace FileTransferReco.ViewModels
             SelectedFile.IsReceive = false;
             SelectedFile.Owner = null;
 
-
-            block.Text = SelectedFile.FileName;
+            PrismApplication.Current.Dispatcher.Invoke(() => { TextContent = SelectedFile.FileName; });
         }
 
     }

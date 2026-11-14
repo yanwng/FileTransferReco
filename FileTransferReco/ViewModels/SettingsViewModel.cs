@@ -15,7 +15,19 @@ namespace FileTransferReco.ViewModels
     {
 
         public DelegateCommand<string> UpdataAppConfig { get; set; }
-        public DelegateCommand<TextBox> UpdataServerPort { get; set; }
+        public DelegateCommand UpdataServerPort { get; set; }
+
+        private string serverPort;
+
+        /// <summary>
+        /// 接受连接的端口
+        /// </summary>
+        public string ServerPort
+        {
+            get { return serverPort; }
+            set {  SetProperty(ref serverPort, value); }
+        }
+
 
         public AppConfig _AppConfig { get; set; }
 
@@ -26,9 +38,12 @@ namespace FileTransferReco.ViewModels
             //依赖注入
             _AppConfig = appConfig;
 
+            //属性初始化
+            ServerPort = _AppConfig.ServerPort.ToString();
+
             //命令初始化
             UpdataAppConfig = new DelegateCommand<string>(UpdataAppConfig_Method);
-            UpdataServerPort = new DelegateCommand<TextBox>(UpdataServerPort_Method);
+            UpdataServerPort = new DelegateCommand(UpdataServerPort_Method);
         }
 
         /// <summary>
@@ -46,17 +61,18 @@ namespace FileTransferReco.ViewModels
         /// <summary>
         /// 更新端口号
         /// </summary>
-        private void UpdataServerPort_Method(TextBox textBox)
+        private void UpdataServerPort_Method()
         {
             int port;
             try
             {
-                port = int.Parse(textBox.Text.Trim());
+                port = int.Parse(ServerPort);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("端口号数值或格式不正确");
-                textBox.Text = _AppConfig.ServerPort+"";
+                LogHelper.RecordAsync($"修改服务器{_AppConfig.ServerPort}端口为{serverPort}失败", LogLevel.WARN);
+                MessageBox.Show("端口格式错误", "端口错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                PrismApplication.Current.Dispatcher.Invoke(() => { ServerPort = _AppConfig.ServerPort.ToString(); });
                 return;
             }
             LogHelper.RecordAsync($"修改服务器{_AppConfig.ServerPort}端口为{port}", LogLevel.WARN);
